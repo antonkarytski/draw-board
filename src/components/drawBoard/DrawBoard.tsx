@@ -1,10 +1,16 @@
 import React from "react";
-import { useDrawBoard } from "./hook.drawBoard";
+import {
+  useDrawBoard,
+  UseDrawBoardProps,
+  withMouseEvent,
+} from "./hook.drawBoard";
 import classes from "./styles.module.scss";
 
-export default function DrawBoard() {
+type DrawBoardProps = {} & UseDrawBoardProps;
+
+export default function DrawBoard({ saveHistoryTo }: DrawBoardProps) {
   const { canvasRef, drawLine, drawDot, resetPosition } = useDrawBoard({
-    saveHistory: true,
+    saveHistoryTo,
   });
 
   return (
@@ -13,10 +19,10 @@ export default function DrawBoard() {
       width={500}
       height={500}
       ref={canvasRef}
-      onMouseDown={drawDot}
+      onMouseDown={(event) => withMouseEvent(drawDot, event)}
       onMouseMove={(event) => {
         if (!event.buttons) return;
-        drawLine(event);
+        withMouseEvent(drawLine, event);
       }}
       onMouseUp={resetPosition}
     />
