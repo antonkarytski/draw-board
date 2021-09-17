@@ -1,8 +1,12 @@
 import React from "react";
-import "./App.css";
+import DrawBoard from "./components/DrawBoard";
 
 function App() {
-  return <div className="App"></div>;
+  return (
+    <div className="App">
+      <DrawBoard />
+    </div>
+  );
 }
 
 export default App;
