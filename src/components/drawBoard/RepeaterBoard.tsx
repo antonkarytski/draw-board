@@ -1,8 +1,5 @@
 import React, { MutableRefObject } from "react";
-import {
-  PointsHistory,
-  useDrawBoard,
-} from "./hook.drawBoard";
+import { PointsHistory, useDrawBoard } from "./hook.drawBoard";
 import classes from "./styles.module.scss";
 
 type RepeaterBoardProps = {
@@ -10,7 +7,7 @@ type RepeaterBoardProps = {
 };
 
 export default function RepeaterBoard({ history }: RepeaterBoardProps) {
-  const { canvasRef, drawDot } = useDrawBoard();
+  const { canvasRef, drawDot, drawLine } = useDrawBoard();
 
   return (
     <div>
@@ -23,8 +20,13 @@ export default function RepeaterBoard({ history }: RepeaterBoardProps) {
       <button
         onClick={() => {
           history.current.forEach(({ firstClick, timeStamp, x, y }) => {
-          
+            if (firstClick) {
+              drawDot({ x, y, timeStamp });
+              return;
+            }
+            drawLine({ x, y, timeStamp });
           });
+          history.current.splice(0, history.current.length);
         }}
       >
         Draw
