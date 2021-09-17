@@ -5,12 +5,26 @@ type Position = {
   y: number;
 };
 
-export default function DrawBoard() {
-  const canvas = useRef<null | HTMLCanvasElement>(null);
+type PointsHistory = ({
+  timestamp: number;
+  firstClick?: boolean;
+} & Position)[];
+
+type UseDrawBoardProps = {
+  saveHistory?: boolean;
+};
+
+export function useDrawBoard({ saveHistory }: UseDrawBoardProps = {}) {
+  const canvasRef = useRef<null | HTMLCanvasElement>(null);
   const prevPosition = useRef<Position | null>(null);
+  const history = useRef<PointsHistory>([]);
+
+  function resetPosition() {
+    prevPosition.current = null;
+  }
 
   function drawDot(event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
-    const ctx = canvas.current?.getContext("2d");
+    const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
     ctx.beginPath();
     ctx.arc(
@@ -24,7 +38,7 @@ export default function DrawBoard() {
   }
 
   function drawLine(event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
-    const ctx = canvas.current?.getContext("2d");
+    const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
     ctx.beginPath();
     const currentX = event.nativeEvent.offsetX;
@@ -39,28 +53,20 @@ export default function DrawBoard() {
       x: currentX,
       y: currentY,
     };
+    if (saveHistory) {
+      history.current.push({
+        x: currentX,
+        y: currentY,
+        timestamp: 1,
+      });
+    }
   }
 
-  return (
-    <canvas
-      width={500}
-      height={500}
-      ref={canvas}
-      style={style}
-      onMouseDown={drawDot}
-      onMouseMove={(event) => {
-        if (!event.buttons) return;
-        drawLine(event);
-      }}
-      onMouseUp={() => {
-        prevPosition.current = null;
-      }}
-    />
-  );
+  return {
+    drawDot,
+    drawLine,
+    resetPosition,
+    canvasRef,
+    history,
+  };
 }
-
-const style = {
-  width: 500,
-  height: 500,
-  border: "1px solid black",
-};

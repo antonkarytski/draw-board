@@ -1,10 +1,14 @@
 import React from "react";
-import DrawBoard from "./components/DrawBoard";
+import DrawBoard from "./components/drawBoard/DrawBoard";
+import RepeaterBoard from "./components/drawBoard/RepeaterBoard";
 
 function App() {
   return (
     <div className="App">
-      <DrawBoard />
+      <div>
+        <DrawBoard />
+        <RepeaterBoard />
+      </div>
     </div>
   );
 }
