@@ -1,9 +1,8 @@
 import React, { MutableRefObject } from "react";
-import { PointsHistory, useDrawBoard } from "./hook.drawBoard";
+import { PointsHistory } from "./hook.drawBoard";
 import classes from "./styles.module.scss";
 import PlayButton from "../buttons/PlayButton";
-import { useDrawBoardHistory } from "./hook.drawBoardHistory";
-import cx from "classnames";
+import { useRepeaterBoard } from "./hook.repeaterBoard";
 import Button from "../buttons/Button";
 
 type RepeaterBoardProps = {
@@ -15,16 +14,13 @@ export default function RepeaterBoard({
   history,
   className,
 }: RepeaterBoardProps) {
-  const { canvasRef, ...controller } = useDrawBoard();
   const {
+    canvasRef,
     stepBack,
     stepForward,
     togglePlaying,
     isPlaying,
-  } = useDrawBoardHistory({
-    controller,
-    history,
-  });
+  } = useRepeaterBoard(history);
 
   return (
     <div className={className}>
@@ -32,7 +28,7 @@ export default function RepeaterBoard({
         width={500}
         height={500}
         ref={canvasRef}
-        className={cx(classes.Canvas)}
+        className={classes.Canvas}
       />
       <div className={classes.ButtonsSet}>
         <Button label={"Step back"} onClick={stepBack} />

@@ -103,3 +103,10 @@ export function useDrawBoardHistory({
     isPlaying: isPlayingState,
   };
 }
+
+export function useRepeaterBoard(history: MutableRefObject<PointsHistory>) {
+  const { canvasRef, ...controller } = useDrawBoard();
+  const historyController = useDrawBoardHistory({ controller, history });
+
+  return { canvasRef, ...historyController };
+}
