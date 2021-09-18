@@ -7,7 +7,23 @@ type RepeaterBoardProps = {
 };
 
 export default function RepeaterBoard({ history }: RepeaterBoardProps) {
-  const { canvasRef, drawDot, drawLine } = useDrawBoard();
+  const { canvasRef, drawDot, drawLine, resetPosition } = useDrawBoard();
+
+  function withTimer(fullData: PointsHistory, currentIndex: number) {
+    if (currentIndex >= fullData.length) return;
+    const { firstClick, ...point } = fullData[currentIndex];
+    if (firstClick) {
+      resetPosition();
+      drawDot(point);
+    } else {
+      drawLine(point);
+    }
+    if (currentIndex === fullData.length - 1) return;
+    const timer = setTimeout(() => {
+      withTimer(fullData, currentIndex + 1);
+      clearTimeout(timer);
+    }, fullData[currentIndex + 1].timeStamp - point.timeStamp);
+  }
 
   return (
     <div>
@@ -19,14 +35,8 @@ export default function RepeaterBoard({ history }: RepeaterBoardProps) {
       />
       <button
         onClick={() => {
-          history.current.forEach(({ firstClick, timeStamp, x, y }) => {
-            if (firstClick) {
-              drawDot({ x, y, timeStamp });
-              return;
-            }
-            drawLine({ x, y, timeStamp });
-          });
-          history.current.splice(0, history.current.length);
+          withTimer(history.current, 0);
+          //history.current.splice(0, history.current.length);
         }}
       >
         Draw
