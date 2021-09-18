@@ -2,18 +2,22 @@ import React, { MutableRefObject, useRef } from "react";
 import { PointsHistory, useDrawBoard } from "./hook.drawBoard";
 import classes from "./styles.module.scss";
 import PlayButton from "../buttons/PlayButton";
+import { findLastIndex } from "../../lib/findLastIndex";
 
 type RepeaterBoardProps = {
   history: MutableRefObject<PointsHistory>;
 };
 
 export default function RepeaterBoard({ history }: RepeaterBoardProps) {
-  const { canvasRef, drawDot, drawLine, resetPosition } = useDrawBoard();
+  const { canvasRef, drawDot, drawLine, resetPosition, clear } = useDrawBoard();
   const drawIndex = useRef(0);
   const isPlaying = useRef(false);
 
   function withTimer() {
-    if (drawIndex.current >= history.current.length) return;
+    if (drawIndex.current >= history.current.length) {
+      drawIndex.current = 0;
+      return;
+    }
     const { firstClick, ...point } = history.current[drawIndex.current];
     if (firstClick) {
       resetPosition();
@@ -21,10 +25,7 @@ export default function RepeaterBoard({ history }: RepeaterBoardProps) {
     } else {
       drawLine(point);
     }
-    if (drawIndex.current === history.current.length - 1) {
-      drawIndex.current = 0;
-      return;
-    }
+    if (drawIndex.current === history.current.length - 1) return;
     drawIndex.current = drawIndex.current + 1;
     if (!isPlaying.current) return;
     const nextDelay =
@@ -38,6 +39,30 @@ export default function RepeaterBoard({ history }: RepeaterBoardProps) {
     );
   }
 
+  function stepBack() {
+    clear();
+    if (!drawIndex.current) return;
+    const prevStepIndex = findLastIndex(
+      history.current,
+      ({ firstClick }, index) => {
+        return !!firstClick && index < drawIndex.current;
+      }
+    );
+    drawIndex.current = prevStepIndex;
+    history.current
+      .filter((_, index) => {
+        return index <= prevStepIndex;
+      })
+      .forEach(({ firstClick, ...point }) => {
+        if (firstClick) {
+          resetPosition();
+          drawDot(point);
+        } else {
+          drawLine(point);
+        }
+      });
+  }
+
   return (
     <div>
       <canvas
@@ -46,6 +71,7 @@ export default function RepeaterBoard({ history }: RepeaterBoardProps) {
         ref={canvasRef}
         className={classes.Canvas}
       />
+      <button onClick={stepBack}>Step back</button>
       <PlayButton
         onClick={() => {
           isPlaying.current = !isPlaying.current;

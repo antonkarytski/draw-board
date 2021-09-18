@@ -66,9 +66,16 @@ export function useDrawBoard({ saveHistoryTo }: UseDrawBoardProps = {}) {
     }
   }
 
+  function clear() {
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!ctx) return;
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+
   return {
     drawDot,
     drawLine,
+    clear,
     resetPosition,
     canvasRef,
   };
