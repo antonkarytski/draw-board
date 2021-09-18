@@ -1,6 +1,7 @@
-import React, { MutableRefObject } from "react";
+import React, { MutableRefObject, useRef } from "react";
 import { PointsHistory, useDrawBoard } from "./hook.drawBoard";
 import classes from "./styles.module.scss";
+import PlayButton from "../buttons/PlayButton";
 
 type RepeaterBoardProps = {
   history: MutableRefObject<PointsHistory>;
@@ -8,21 +9,33 @@ type RepeaterBoardProps = {
 
 export default function RepeaterBoard({ history }: RepeaterBoardProps) {
   const { canvasRef, drawDot, drawLine, resetPosition } = useDrawBoard();
+  const drawIndex = useRef(0);
+  const isPlaying = useRef(false);
 
-  function withTimer(fullData: PointsHistory, currentIndex: number) {
-    if (currentIndex >= fullData.length) return;
-    const { firstClick, ...point } = fullData[currentIndex];
+  function withTimer() {
+    if (drawIndex.current >= history.current.length) return;
+    const { firstClick, ...point } = history.current[drawIndex.current];
     if (firstClick) {
       resetPosition();
       drawDot(point);
     } else {
       drawLine(point);
     }
-    if (currentIndex === fullData.length - 1) return;
-    const timer = setTimeout(() => {
-      withTimer(fullData, currentIndex + 1);
-      clearTimeout(timer);
-    }, fullData[currentIndex + 1].timeStamp - point.timeStamp);
+    if (drawIndex.current === history.current.length - 1) {
+      drawIndex.current = 0;
+      return;
+    }
+    drawIndex.current = drawIndex.current + 1;
+    if (!isPlaying.current) return;
+    const nextDelay =
+      history.current[drawIndex.current].timeStamp - point.timeStamp;
+    const timer = setTimeout(
+      () => {
+        withTimer();
+        clearTimeout(timer);
+      },
+      nextDelay > 500 ? 500 : nextDelay
+    );
   }
 
   return (
@@ -33,14 +46,13 @@ export default function RepeaterBoard({ history }: RepeaterBoardProps) {
         ref={canvasRef}
         className={classes.Canvas}
       />
-      <button
+      <PlayButton
         onClick={() => {
-          withTimer(history.current, 0);
+          isPlaying.current = !isPlaying.current;
+          if (isPlaying.current) withTimer();
           //history.current.splice(0, history.current.length);
         }}
-      >
-        Draw
-      </button>
+      />
     </div>
   );
 }
