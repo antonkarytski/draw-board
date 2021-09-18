@@ -10,7 +10,12 @@ type RepeaterBoardProps = {
 
 export default function RepeaterBoard({ history }: RepeaterBoardProps) {
   const { canvasRef, ...controller } = useDrawBoard();
-  const { stepBack, stepForward, togglePlaying } = useDrawBoardHistory({
+  const {
+    stepBack,
+    stepForward,
+    togglePlaying,
+    isPlaying,
+  } = useDrawBoardHistory({
     controller,
     history,
   });
@@ -23,9 +28,11 @@ export default function RepeaterBoard({ history }: RepeaterBoardProps) {
         ref={canvasRef}
         className={classes.Canvas}
       />
-      <button onClick={stepBack}>Step back</button>
-      <PlayButton onClick={togglePlaying} />
-      <button onClick={stepForward}>Step forward</button>
+      <div>
+        <button onClick={stepBack}>Step back</button>
+        <PlayButton isClicked={isPlaying} onClick={togglePlaying} />
+        <button onClick={stepForward}>Step forward</button>
+      </div>
     </div>
   );
 }

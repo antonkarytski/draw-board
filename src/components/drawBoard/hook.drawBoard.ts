@@ -5,20 +5,20 @@ type Position = {
   y: number;
 };
 
-type PointData = {
+export type Point = {
   timeStamp: number;
 } & Position;
 
 export type PointsHistory = ({
   firstClick?: boolean;
-} & PointData)[];
+} & Point)[];
 
 export type UseDrawBoardProps = {
   saveHistoryTo?: MutableRefObject<PointsHistory>;
 };
 
 export function withMouseEvent(
-  handler: (position: PointData) => void,
+  handler: (position: Point) => void,
   event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
 ) {
   const point = {
@@ -37,23 +37,18 @@ export function useDrawBoard({ saveHistoryTo }: UseDrawBoardProps = {}) {
     prevPosition.current = null;
   }
 
-  function drawDot({ x, y, timeStamp }: PointData) {
+  function drawDot({ x, y, timeStamp }: Point) {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
     ctx.beginPath();
     ctx.arc(x, y, 1, 0, 2 * Math.PI);
     ctx.fill();
     if (saveHistoryTo) {
-      saveHistoryTo.current.push({
-        x,
-        y,
-        timeStamp,
-        firstClick: true,
-      });
+      saveHistoryTo.current.push({ x, y, timeStamp, firstClick: true });
     }
   }
 
-  function drawLine({ x, y, timeStamp }: PointData) {
+  function drawLine({ x, y, timeStamp }: Point) {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
     ctx.beginPath();

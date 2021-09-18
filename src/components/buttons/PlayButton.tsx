@@ -1,20 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 
 type ButtonProps = {
   onClick: () => void;
+  isClicked: boolean;
 };
 
-export default function PlayButton({ onClick }: ButtonProps) {
-  const [isClicked, setIsClicked] = useState(false);
-
-  return (
-    <button
-      onClick={() => {
-        onClick();
-        setIsClicked((state) => !state);
-      }}
-    >
-      {isClicked ? "Pause" : "Play"}
-    </button>
-  );
+export default function PlayButton({ onClick, isClicked }: ButtonProps) {
+  return <button onClick={onClick}>{isClicked ? "Pause" : "Play"}</button>;
 }
