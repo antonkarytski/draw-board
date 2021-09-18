@@ -43,6 +43,7 @@ export function useDrawBoard({ saveHistoryTo }: UseDrawBoardProps = {}) {
     ctx.beginPath();
     ctx.arc(x, y, 1, 0, 2 * Math.PI);
     ctx.fill();
+    prevPosition.current = { x, y };
     if (saveHistoryTo) {
       saveHistoryTo.current.push({ x, y, timeStamp, firstClick: true });
     }
@@ -64,6 +65,7 @@ export function useDrawBoard({ saveHistoryTo }: UseDrawBoardProps = {}) {
   function clear() {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
+    prevPosition.current = null;
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   }
 

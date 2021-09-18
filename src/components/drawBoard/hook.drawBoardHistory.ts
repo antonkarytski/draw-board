@@ -11,7 +11,7 @@ export function useDrawBoardHistory({
   history,
   controller,
 }: UseDrawBoardHistoryProps) {
-  const drawIndex = useRef(0);
+  const currentPointIndex = useRef(-1);
   const isPlaying = useRef(false);
   const [isPlayingState, setIsPlayingState] = useState(false);
   const { drawDot, drawLine, resetPosition, clear } = controller;
@@ -26,17 +26,21 @@ export function useDrawBoardHistory({
   }
 
   function withDelay() {
-    if (drawIndex.current >= history.current.length) {
-      drawIndex.current = 0;
+    if (!history.current.length) return;
+    if (currentPointIndex.current >= history.current.length - 1) {
+      clear();
+      currentPointIndex.current = -1;
+    }
+    const newPointIndex = currentPointIndex.current + 1;
+    currentPointIndex.current = newPointIndex;
+    const point = history.current[newPointIndex];
+    draw(point);
+    if (!isPlaying.current || newPointIndex === history.current.length - 1) {
       return;
     }
-    const point = history.current[drawIndex.current];
-    draw(point);
-    if (drawIndex.current === history.current.length - 1) return;
-    drawIndex.current = drawIndex.current + 1;
-    if (!isPlaying.current) return;
     const nextDelay =
-      history.current[drawIndex.current].timeStamp - point.timeStamp;
+      history.current[currentPointIndex.current + 1].timeStamp -
+      point.timeStamp;
     const timer = setTimeout(
       () => {
         withDelay();
@@ -47,6 +51,7 @@ export function useDrawBoardHistory({
   }
 
   function togglePlaying() {
+    if (!history.current.length) return;
     isPlaying.current = !isPlaying.current;
     setIsPlayingState(isPlaying.current);
     if (isPlaying.current) withDelay();
@@ -58,35 +63,40 @@ export function useDrawBoardHistory({
   }
 
   function stepBack() {
-    clear();
-    if (!drawIndex.current) return;
+    if (currentPointIndex.current === -1) return;
     pause();
-    const prevStepIndex = findLastIndex(
+    clear();
+    const currentStepStartIndex = findLastIndex(
       history.current,
       ({ firstClick }, index) => {
-        return !!firstClick && index < drawIndex.current;
+        return !!firstClick && index < currentPointIndex.current;
       }
     );
-    drawIndex.current = prevStepIndex;
-    history.current.slice(0, prevStepIndex + 1).forEach(draw);
+    const lastPrevStepIndex =
+      currentStepStartIndex === -1 ? -1 : currentStepStartIndex - 1;
+    currentPointIndex.current = lastPrevStepIndex;
+    if (lastPrevStepIndex === -1) return;
+    history.current.slice(0, lastPrevStepIndex + 1).forEach(draw);
   }
 
   function stepForward() {
-    if (drawIndex.current >= history.current.length - 1) return;
+    if (currentPointIndex.current >= history.current.length - 1) return;
     pause();
+    const nextFirstClick = history.current.findIndex(
+      ({ firstClick }, index) => {
+        return !!firstClick && index > currentPointIndex.current + 1;
+      }
+    );
     const nextStepIndex =
-      history.current.findIndex(({ firstClick }, index) => {
-        return !!firstClick && index > drawIndex.current;
-      }) || history.current.length - 1;
+      nextFirstClick !== -1 ? nextFirstClick - 1 : history.current.length - 1;
     history.current
-      .slice(drawIndex.current + 1, nextStepIndex + 1)
+      .slice(currentPointIndex.current + 1, nextStepIndex + 1)
       .forEach(draw);
-    drawIndex.current = nextStepIndex;
+    currentPointIndex.current = nextStepIndex;
   }
 
   return {
     togglePlaying,
-    pause,
     stepBack,
     stepForward,
     isPlaying: isPlayingState,
