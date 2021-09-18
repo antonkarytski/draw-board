@@ -36,7 +36,11 @@ export default function RepeaterBoard({
       />
       <div className={classes.ButtonsSet}>
         <Button label={"Step back"} onClick={stepBack} />
-        <PlayButton isClicked={isPlaying} onClick={togglePlaying} />
+        <PlayButton
+          className={classes.PlayButton}
+          isClicked={isPlaying}
+          onClick={togglePlaying}
+        />
         <Button label={"Step forward"} onClick={stepForward} />
       </div>
     </div>

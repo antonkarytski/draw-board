@@ -26,7 +26,7 @@ export function useDrawBoardHistory({
   }
 
   function withDelay() {
-    if (!history.current.length) return;
+    if (!isPlaying.current || !history.current?.length) return;
     if (currentPointIndex.current >= history.current.length - 1) {
       clear();
       currentPointIndex.current = -1;

@@ -5,6 +5,9 @@ type PlayButtonProps = {
   isClicked: boolean;
 } & Omit<ButtonProps, "label">;
 
-export default function PlayButton({ onClick, isClicked }: PlayButtonProps) {
-  return <Button onClick={onClick} label={isClicked ? "Pause" : "Play"} />;
+export default function PlayButton({
+  isClicked,
+  ...buttonProps
+}: PlayButtonProps) {
+  return <Button label={isClicked ? "Pause" : "Play"} {...buttonProps} />;
 }
