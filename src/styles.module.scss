@@ -1,3 +1,19 @@
-.Container{
+.App{
   display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+}
+
+.DrawBoard{
+  background-color: #e0e0e0;
+}
+
+.RepeaterBoard{
+  margin-left: 30px;
+
+  > canvas{
+    background-color: #a7a7a7;
+  }
 }

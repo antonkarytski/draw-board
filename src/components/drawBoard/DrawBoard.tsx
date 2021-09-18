@@ -5,17 +5,21 @@ import {
   withMouseEvent,
 } from "./hook.drawBoard";
 import classes from "./styles.module.scss";
+import cx from "classnames";
 
-type DrawBoardProps = {} & UseDrawBoardProps;
+type DrawBoardProps = { className?: string } & UseDrawBoardProps;
 
-export default function DrawBoard({ saveHistoryTo }: DrawBoardProps) {
+export default function DrawBoard({
+  saveHistoryTo,
+  className,
+}: DrawBoardProps) {
   const { canvasRef, drawLine, drawDot, resetPosition } = useDrawBoard({
     saveHistoryTo,
   });
 
   return (
     <canvas
-      className={classes.Canvas}
+      className={cx(classes.Canvas, className)}
       width={500}
       height={500}
       ref={canvasRef}

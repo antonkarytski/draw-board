@@ -3,33 +3,40 @@ import DrawBoard from "./components/drawBoard/DrawBoard";
 import RepeaterBoard from "./components/drawBoard/RepeaterBoard";
 import classes from "./styles.module.scss";
 import { PointsHistory } from "./components/drawBoard/hook.drawBoard";
+import Button from "./components/buttons/Button";
 
 function App() {
   const history = useRef<PointsHistory>([]);
   const [keys, setKeys] = useState({
-    draw: Math.random(),
-    repeater: Math.random(),
+    draw: 1,
+    repeater: 2,
   });
 
   function reset() {
     history.current = [];
-    setKeys({
-      draw: Math.random(),
-      repeater: Math.random(),
-    });
+    setKeys(({ draw, repeater }) => ({
+      draw: draw + 1,
+      repeater: repeater + 1,
+    }));
   }
 
   return (
-    <div>
-      <div className={classes.Container}>
+    <div className={classes.App}>
+      <div>
+        <DrawBoard
+          key={keys.draw}
+          saveHistoryTo={history}
+          className={classes.DrawBoard}
+        />
         <div>
-          <DrawBoard key={keys.draw} saveHistoryTo={history} />
-          <div>
-            <button onClick={reset}>Reset</button>
-          </div>
+          <Button label={"Reset"} onClick={reset} />
         </div>
-        <RepeaterBoard key={keys.repeater} history={history} />
       </div>
+      <RepeaterBoard
+        key={keys.repeater}
+        history={history}
+        className={classes.RepeaterBoard}
+      />
     </div>
   );
 }

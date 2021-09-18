@@ -35,9 +35,10 @@ export function useDrawBoardHistory({
     currentPointIndex.current = newPointIndex;
     const point = history.current[newPointIndex];
     draw(point);
-    if (!isPlaying.current || newPointIndex === history.current.length - 1) {
-      return;
+    if (newPointIndex === history.current.length - 1) {
+      pause();
     }
+    if (!isPlaying.current) return;
     const nextDelay =
       history.current[currentPointIndex.current + 1].timeStamp -
       point.timeStamp;
